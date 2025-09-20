@@ -14,7 +14,117 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      job_descriptions: {
+        Row: {
+          created_at: string
+          description_file: string | null
+          id: string
+          location: string | null
+          parsed_text: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description_file?: string | null
+          id?: string
+          location?: string | null
+          parsed_text?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description_file?: string | null
+          id?: string
+          location?: string | null
+          parsed_text?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      matches: {
+        Row: {
+          created_at: string
+          feedback: string | null
+          id: string
+          job_id: string
+          missing_skills: string[] | null
+          resume_id: string
+          score: number | null
+          updated_at: string
+          verdict: string | null
+        }
+        Insert: {
+          created_at?: string
+          feedback?: string | null
+          id?: string
+          job_id: string
+          missing_skills?: string[] | null
+          resume_id: string
+          score?: number | null
+          updated_at?: string
+          verdict?: string | null
+        }
+        Update: {
+          created_at?: string
+          feedback?: string | null
+          id?: string
+          job_id?: string
+          missing_skills?: string[] | null
+          resume_id?: string
+          score?: number | null
+          updated_at?: string
+          verdict?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matches_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "job_descriptions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_resume_id_fkey"
+            columns: ["resume_id"]
+            isOneToOne: false
+            referencedRelation: "resumes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      resumes: {
+        Row: {
+          candidate_name: string
+          created_at: string
+          id: string
+          location: string | null
+          parsed_text: string | null
+          resume_file: string | null
+          updated_at: string
+        }
+        Insert: {
+          candidate_name: string
+          created_at?: string
+          id?: string
+          location?: string | null
+          parsed_text?: string | null
+          resume_file?: string | null
+          updated_at?: string
+        }
+        Update: {
+          candidate_name?: string
+          created_at?: string
+          id?: string
+          location?: string | null
+          parsed_text?: string | null
+          resume_file?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
