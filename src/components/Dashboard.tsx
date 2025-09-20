@@ -1,14 +1,17 @@
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Brain, Search, BarChart3 } from 'lucide-react';
+import { Brain, Search, BarChart3, Home, LogOut } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useAuthContext } from '@/App';
 import JobDescriptionUpload from './JobDescriptionUpload';
 import ResumeUpload from './ResumeUpload';
 import AnalysisPanel from './AnalysisPanel';
 
-const Dashboard = () => {
+const Dashboard = ({ onBackToHome }: { onBackToHome: () => void }) => {
   const [activeTab, setActiveTab] = useState('upload');
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const { signOut } = useAuthContext();
 
   const handleRefresh = () => {
     setRefreshTrigger(prev => prev + 1);
@@ -25,6 +28,14 @@ const Dashboard = () => {
               <h1 className="text-2xl font-bold text-gray-900">AI Recruitment Analyzer</h1>
               <p className="text-sm text-gray-500">Smart candidate matching powered by AI</p>
             </div>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button variant="ghost" size="sm" onClick={onBackToHome}>
+              <Home className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="sm" onClick={signOut}>
+              <LogOut className="h-4 w-4" />
+            </Button>
           </div>
         </div>
       </div>
