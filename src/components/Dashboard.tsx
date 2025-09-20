@@ -25,8 +25,8 @@ const Dashboard = ({ onBackToHome }: { onBackToHome: () => void }) => {
           <div className="flex items-center space-x-3">
             <Brain className="h-8 w-8 text-blue-600" />
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">AI Recruitment Analyzer</h1>
-              <p className="text-sm text-gray-500">Smart candidate matching powered by AI</p>
+              <h1 className="text-2xl font-bold text-gray-900">Merit Muse</h1>
+              <p className="text-sm text-gray-500">Smart candidate matching powered by Merit Muse</p>
             </div>
           </div>
           <div className="flex items-center space-x-2">
