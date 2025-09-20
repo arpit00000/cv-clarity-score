@@ -20,7 +20,7 @@ const Hero = ({ onGetStarted }: HeroProps) => {
               <div className="w-8 h-8 bg-gradient-to-r from-primary to-info rounded-lg flex items-center justify-center">
                 <Target className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold">ResumeMatch Pro</span>
+              <span className="text-xl font-bold">Merit Muse</span>
             </div>
             <div className="flex items-center gap-4">
               <Button variant="ghost">Features</Button>
@@ -113,9 +113,9 @@ const Hero = ({ onGetStarted }: HeroProps) => {
 
           <div className="relative">
             <div className="relative z-10 rounded-2xl overflow-hidden shadow-2xl">
-              <img 
-                src={heroImage} 
-                alt="Professional recruitment dashboard" 
+              <img
+                src={heroImage}
+                alt="Merit Muse recruitment dashboard"
                 className="w-full h-auto object-cover"
               />
             </div>
