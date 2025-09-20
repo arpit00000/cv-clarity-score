@@ -1,73 +1,125 @@
-# Welcome to your Lovable project
+📝 Automated Resume Relevance Check System
+Project Overview
 
-## Project info
+This project is an AI-powered Resume Relevance Check System designed to help placement teams efficiently evaluate resumes against job descriptions. It automates the resume screening process by generating a Relevance Score, highlighting missing skills/projects, providing a suitability verdict, and offering actionable feedback to candidates.
 
-**URL**: https://lovable.dev/projects/f059471e-83ca-415d-aa57-a7b4d437cbdf
+The system is built on Lovable, leveraging a modern tech stack with React, TypeScript, Tailwind CSS, and AI integrations for semantic matching.
 
-## How can I edit this code?
+🌐 Project URL
 
-There are several ways of editing your application.
+Access your Lovable project here:
+https://lovable.dev/projects/f059471e-83ca-415d-aa57-a7b4d437cbdf
 
-**Use Lovable**
+⚡ Features
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/f059471e-83ca-415d-aa57-a7b4d437cbdf) and start prompting.
+Upload Job Descriptions (PDF/DOCX).
 
-Changes made via Lovable will be committed automatically to this repo.
+Upload Resumes from candidates.
 
-**Use your preferred IDE**
+Automatic Resume Parsing and text extraction.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Hard Match: Keyword & skill checks.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+Semantic Match: AI-powered embedding similarity.
 
-Follow these steps:
+Generate Relevance Score (0–100).
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+Provide Verdict: High / Medium / Low suitability.
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+Highlight Missing Skills, Certifications, Projects.
 
-# Step 3: Install the necessary dependencies.
-npm i
+Offer Personalized Improvement Feedback.
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+Searchable Dashboard for placement teams.
+
+🛠 Tech Stack
+
+Frontend: React, TypeScript, Tailwind CSS, shadcn-ui, Vite
+
+Backend / AI: Python (resume parsing & scoring), OpenAI/Claude embeddings
+
+Database: Lovable collections (PostgreSQL under the hood)
+
+Deployment: Directly via Lovable (no extra setup needed)
+
+🚀 Getting Started
+Option 1: Edit in Lovable
+
+Open the Lovable Project
+.
+
+Start editing or prompting to modify your application.
+
+Changes are committed automatically.
+
+Option 2: Edit Locally
+
+Clone the repository:
+
+git clone <https://github.com/arpit00000/cv-clarity-score/edit/main/README.md>
+cd <Automated Resume Relevance Check System>
+
+
+Install dependencies:
+
+npm install
+
+
+Start the development server:
+
 npm run dev
-```
 
-**Edit a file directly in GitHub**
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Open http://localhost:5173 in your browser to preview.
 
-**Use GitHub Codespaces**
+Option 3: Edit on GitHub / Codespaces
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Navigate to the file on GitHub → Click the pencil icon → Edit → Commit.
 
-## What technologies are used for this project?
+Or launch a GitHub Codespace for an IDE-like environment online.
 
-This project is built with:
+📦 Project Structure
+/src
+  ├─ components/       # React UI components
+  ├─ pages/            # Dashboard & upload pages
+  ├─ services/         # API calls / Python AI integration
+  └─ styles/           # Tailwind & global CSS
+collections/           # Lovable database schema
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+🔑 Environment Variables
 
-## How can I deploy this project?
+OPENAI_API_KEY – For AI embeddings and semantic analysis
 
-Simply open [Lovable](https://lovable.dev/projects/f059471e-83ca-415d-aa57-a7b4d437cbdf) and click on Share -> Publish.
+ANTHROPIC_API_KEY – Optional, if using Claude
 
-## Can I connect a custom domain to my Lovable project?
+📤 Deployment
 
-Yes, you can!
+Open your project in Lovable.
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+Click Share → Publish.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Optional: Connect a custom domain via Project > Settings > Domains.
+
+🎯 Usage
+
+Placement team uploads Job Descriptions.
+
+Candidates upload their resumes.
+
+Click Analyze → Relevance Score, Missing Skills, Verdict, and Feedback are displayed.
+
+Filter and search resumes by job role, score, or location.
+
+✅ Contributing
+
+Fork the repository → Create a feature branch → Submit a pull request.
+
+Use Lovable prompts to generate new components or workflows.
+
+📖 References
+
+Lovable Documentation
+
+OpenAI API
+
+Anthropic Claude API
