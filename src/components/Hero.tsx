@@ -2,12 +2,14 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Users, BarChart3, Zap, Target } from 'lucide-react';
 import heroImage from '@/assets/hero-recruitment.jpg';
+import { useAuthContext } from '@/App';
 
 interface HeroProps {
   onGetStarted: () => void;
 }
 
 const Hero = ({ onGetStarted }: HeroProps) => {
+  const { session, signInWithGoogle, signOut } = useAuthContext();
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-background via-background to-secondary/20">
       {/* Navigation */}
@@ -23,7 +25,15 @@ const Hero = ({ onGetStarted }: HeroProps) => {
             <div className="flex items-center gap-4">
               <Button variant="ghost">Features</Button>
               <Button variant="ghost">Pricing</Button>
-              <Button variant="outline">Sign In</Button>
+              {session ? (
+                <Button variant="outline" onClick={signOut}>
+                  Sign Out
+                </Button>
+              ) : (
+                <Button variant="outline" onClick={signInWithGoogle}>
+                  Sign In with Google
+                </Button>
+              )}
               <Button variant="hero" onClick={onGetStarted}>
                 Get Started
               </Button>
