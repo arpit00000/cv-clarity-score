@@ -56,21 +56,50 @@ const JobDescriptionUpload = ({ onUpload }: JobDescriptionUploadProps) => {
       if (uploadError) throw uploadError;
 
       // Create job description record
-      const { error: insertError } = await supabase
+      const { data: jobData, error: insertError } = await supabase
         .from('job_descriptions')
         .insert({
           title,
           location,
-          description_file: fileName,
-          parsed_text: 'File uploaded - parsing pending'
-        });
+          description_file: fileName
+        })
+        .select('id')
+        .single();
 
       if (insertError) throw insertError;
 
-      toast({
-        title: "Success",
-        description: "Job description uploaded successfully"
-      });
+      // Trigger document parsing
+      try {
+        const { error: parseError } = await supabase.functions.invoke('parse-document', {
+          body: {
+            filePath: fileName,
+            bucketName: 'job-descriptions',
+            documentId: jobData.id,
+            documentType: 'job_description'
+          }
+        });
+
+        if (parseError) {
+          console.error('Parse error:', parseError);
+          toast({
+            title: "Document uploaded",
+            description: "File uploaded successfully, but document parsing failed. You may need to reparse manually.",
+            variant: "destructive"
+          });
+        } else {
+          toast({
+            title: "Success!",
+            description: "Job description uploaded and processed successfully"
+          });
+        }
+      } catch (parseError) {
+        console.error('Parse function error:', parseError);
+        toast({
+          title: "Document uploaded",
+          description: "File uploaded successfully, but document parsing is pending.",
+          variant: "default"
+        });
+      }
 
       setTitle('');
       setLocation('');

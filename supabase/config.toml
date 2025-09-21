@@ -1,1 +1,7 @@
 project_id = "fitkxkahoxljhttndemg"
+
+[functions.parse-document]
+verify_jwt = false
+
+[functions.analyze-resume]
+verify_jwt = false

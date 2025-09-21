@@ -18,6 +18,7 @@ interface Resume {
   id: string;
   candidate_name: string;
   location: string;
+  parsed_text?: string;
 }
 
 interface Match {
@@ -60,7 +61,7 @@ const AnalysisPanel = () => {
   const fetchResumes = async () => {
     const { data, error } = await supabase
       .from('resumes')
-      .select('id, candidate_name, location')
+      .select('id, candidate_name, location, parsed_text')
       .order('created_at', { ascending: false });
     
     if (error) {
@@ -91,6 +92,30 @@ const AnalysisPanel = () => {
     }
   };
 
+  const handleBulkAnalyze = async () => {
+    if (!selectedJobId) return;
+    
+    const parsedResumes = resumes.filter(r => r.parsed_text && r.parsed_text !== 'File uploaded - parsing pending');
+    setIsAnalyzing(true);
+    
+    for (const resume of parsedResumes) {
+      try {
+        await supabase.functions.invoke('analyze-resume', {
+          body: { jobId: selectedJobId, resumeId: resume.id }
+        });
+      } catch (error) {
+        console.error(`Failed to analyze resume ${resume.id}:`, error);
+      }
+    }
+    
+    setIsAnalyzing(false);
+    fetchMatches();
+    toast({
+      title: "Bulk analysis complete",
+      description: `Analyzed ${parsedResumes.length} resumes`,
+    });
+  };
+
   const handleAnalyze = async (resumeId: string) => {
     if (!selectedJobId) {
       toast({
@@ -103,38 +128,54 @@ const AnalysisPanel = () => {
 
     setIsAnalyzing(true);
     try {
-      // For now, create a mock analysis result
-      const mockScore = Math.floor(Math.random() * 100);
-      const mockVerdict = mockScore >= 80 ? 'High' : mockScore >= 60 ? 'Medium' : 'Low';
-      const mockSkills = ['Cloud Computing', 'Docker', 'Kubernetes'].slice(0, Math.floor(Math.random() * 3));
-      const mockFeedback = `Candidate shows strong technical skills with a score of ${mockScore}%. ${
-        mockSkills.length > 0 ? `Consider developing skills in: ${mockSkills.join(', ')}.` : 'Well-rounded candidate.'
-      }`;
-
-      const { error } = await supabase
-        .from('matches')
-        .insert({
-          job_id: selectedJobId,
-          resume_id: resumeId,
-          score: mockScore,
-          verdict: mockVerdict,
-          missing_skills: mockSkills,
-          feedback: mockFeedback
-        });
-
-      if (error) throw error;
-
-      toast({
-        title: "Analysis complete",
-        description: "Resume analysis has been completed successfully"
+      console.log(`Starting AI analysis for resume ${resumeId} against job ${selectedJobId}`);
+      
+      const { data, error } = await supabase.functions.invoke('analyze-resume', {
+        body: {
+          jobId: selectedJobId,
+          resumeId: resumeId
+        }
       });
 
+      if (error) {
+        console.error('Analysis error:', error);
+        throw new Error(error.message || 'Analysis failed');
+      }
+
+      if (!data?.success) {
+        throw new Error(data?.error || 'Analysis failed');
+      }
+
+      console.log('Analysis completed successfully:', data.result);
+
+      toast({
+        title: "Analysis complete!",
+        description: `Resume analyzed successfully. Score: ${data.result.score}%`,
+        variant: "default"
+      });
+
+      // Refresh the matches to show the new analysis
       fetchMatches();
+      
     } catch (error) {
       console.error('Analysis error:', error);
+      
+      let errorMessage = 'Failed to analyze resume. ';
+      if (error instanceof Error) {
+        if (error.message.includes('parsed_text')) {
+          errorMessage += 'Make sure both the job description and resume have been successfully parsed.';
+        } else if (error.message.includes('OpenAI')) {
+          errorMessage += 'AI service is temporarily unavailable. Please try again later.';
+        } else {
+          errorMessage += error.message;
+        }
+      } else {
+        errorMessage += 'Please try again.';
+      }
+      
       toast({
         title: "Analysis failed",
-        description: "Failed to analyze resume",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
@@ -184,6 +225,22 @@ const AnalysisPanel = () => {
                   </SelectContent>
                 </Select>
               </div>
+              
+              {selectedJobId && resumes.length > 0 && (
+                <div className="border-t pt-4">
+                  <Button
+                    onClick={handleBulkAnalyze}
+                    disabled={isAnalyzing || !selectedJobId}
+                    variant="secondary"
+                    className="w-full"
+                  >
+                    {isAnalyzing ? 'Analyzing...' : `Analyze All Resumes (${resumes.filter(r => r.parsed_text && r.parsed_text !== 'File uploaded - parsing pending').length})`}
+                  </Button>
+                  <p className="text-xs text-muted-foreground mt-2 text-center">
+                    Bulk analyze all parsed resumes against selected job
+                  </p>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -227,25 +284,36 @@ const AnalysisPanel = () => {
               <TableRow>
                 <TableHead>Candidate</TableHead>
                 <TableHead>Location</TableHead>
+                <TableHead>Parse Status</TableHead>
                 <TableHead>Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {resumes.map((resume) => (
-                <TableRow key={resume.id}>
-                  <TableCell className="font-medium">{resume.candidate_name}</TableCell>
-                  <TableCell>{resume.location || 'Not specified'}</TableCell>
-                  <TableCell>
-                    <Button
-                      size="sm"
-                      onClick={() => handleAnalyze(resume.id)}
-                      disabled={isAnalyzing || !selectedJobId}
-                    >
-                      {isAnalyzing ? 'Analyzing...' : 'Analyze'}
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {resumes.map((resume) => {
+                const isParsed = resume.parsed_text && resume.parsed_text !== 'File uploaded - parsing pending';
+                return (
+                  <TableRow key={resume.id}>
+                    <TableCell className="font-medium">{resume.candidate_name}</TableCell>
+                    <TableCell>{resume.location || 'Not specified'}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full ${isParsed ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
+                        <span className="text-sm">{isParsed ? 'Parsed' : 'Parsing...'}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        size="sm"
+                        onClick={() => handleAnalyze(resume.id)}
+                        disabled={isAnalyzing || !selectedJobId || !isParsed}
+                        title={!isParsed ? 'Document must be parsed before analysis' : ''}
+                      >
+                        {isAnalyzing ? 'Analyzing...' : 'Analyze'}
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </CardContent>

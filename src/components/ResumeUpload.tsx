@@ -56,21 +56,50 @@ const ResumeUpload = ({ onUpload }: ResumeUploadProps) => {
       if (uploadError) throw uploadError;
 
       // Create resume record
-      const { error: insertError } = await supabase
+      const { data: resumeData, error: insertError } = await supabase
         .from('resumes')
         .insert({
           candidate_name: candidateName,
           location,
-          resume_file: fileName,
-          parsed_text: 'File uploaded - parsing pending'
-        });
+          resume_file: fileName
+        })
+        .select('id')
+        .single();
 
       if (insertError) throw insertError;
 
-      toast({
-        title: "Success",
-        description: "Resume uploaded successfully"
-      });
+      // Trigger document parsing
+      try {
+        const { error: parseError } = await supabase.functions.invoke('parse-document', {
+          body: {
+            filePath: fileName,
+            bucketName: 'resumes',
+            documentId: resumeData.id,
+            documentType: 'resume'
+          }
+        });
+
+        if (parseError) {
+          console.error('Parse error:', parseError);
+          toast({
+            title: "Document uploaded",
+            description: "Resume uploaded successfully, but document parsing failed. You may need to reparse manually.",
+            variant: "destructive"
+          });
+        } else {
+          toast({
+            title: "Success!",
+            description: "Resume uploaded and processed successfully"
+          });
+        }
+      } catch (parseError) {
+        console.error('Parse function error:', parseError);
+        toast({
+          title: "Document uploaded",
+          description: "Resume uploaded successfully, but document parsing is pending.",
+          variant: "default"
+        });
+      }
 
       setCandidateName('');
       setLocation('');
